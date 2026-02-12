@@ -44,5 +44,13 @@ module.exports = {
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
+    },
+    getAllJestas: async (req, res) => {
+    try {
+        const jestas = await Jesta.find(); // מחזיר הכל
+        res.json(jestas);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
+}
 };

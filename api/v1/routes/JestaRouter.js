@@ -4,9 +4,10 @@ const router = express.Router();
 const {
     createJesta,
     getGivenJestas,
-    getReceivedJestas
+    getReceivedJestas,
+    getAllJestas
 } = require('../controller/JestaController');
-
+router.get('/',getAllJestas );
 router.post('/', createJesta);
 router.get('/given/:uid', getGivenJestas);
 router.get('/received/:uid', getReceivedJestas);
