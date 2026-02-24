@@ -2,41 +2,49 @@ const Jesta = require('../model/JestaModel');
 const User = require('../model/UserModel');
 
 module.exports = {
-
-        getUserByUid: async (req, res) => {
+    // Get a user by UID
+    getUserByUid: async (req, res) => {
         try {
             const { uid } = req.params;
-            const user = await User.findOne({ firebaseUid: uid });
+
+            // Look up by UID (matches Android class)
+            const user = await User.findOne({ UID: uid });
             if (!user) {
                 return res.status(404).json({ error: 'User not found' });
             }
+
             res.json(user);
+
         } catch (err) {
+            console.error("Error in getUserByUid:", err);
             res.status(500).json({ error: err.message });
         }
     },
 
-
-        createUser: async (req, res) => {
+    // Create a new user
+    createUser: async (req, res) => {
         try {
-            const { firebaseUid, name, imageUrl } = req.body;
+            const { UID, name, imageUrl, location } = req.body;
 
-            // check if user already exists
-            const existingUser = await User.findOne({ firebaseUid });
+            // Check if user already exists
+            const existingUser = await User.findOne({ UID });
             if (existingUser) {
                 return res.status(400).json({ error: 'User already exists' });
             }
 
+            // Create user with default points
             const user = await User.create({
-                firebaseUid,
+                UID,
                 name,
                 imageUrl,
-                points: 500 // default points
+                location,
+                points: 500
             });
 
             res.status(201).json(user);
 
         } catch (err) {
+            console.error("Error in createUser:", err);
             res.status(500).json({ error: err.message });
         }
     },
