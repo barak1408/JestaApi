@@ -3,6 +3,30 @@ const User = require('../model/UserModel');
 
 module.exports = {
 
+        createUser: async (req, res) => {
+        try {
+            const { firebaseUid, name, imageUrl } = req.body;
+
+            // check if user already exists
+            const existingUser = await User.findOne({ firebaseUid });
+            if (existingUser) {
+                return res.status(400).json({ error: 'User already exists' });
+            }
+
+            const user = await User.create({
+                firebaseUid,
+                name,
+                imageUrl,
+                points: 500 // default points
+            });
+
+            res.status(201).json(user);
+
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    },
+
     createJesta: async (req, res) => {
         try {
 
