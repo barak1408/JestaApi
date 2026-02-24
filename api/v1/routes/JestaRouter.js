@@ -13,5 +13,6 @@ router.post('/', createJesta);
 router.post('/', createUser);
 router.get('/given/:uid', getGivenJestas);
 router.get('/received/:uid', getReceivedJestas);
+router.get('/:uid', getUserByUid);
 
 module.exports = router;

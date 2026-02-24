@@ -3,6 +3,20 @@ const User = require('../model/UserModel');
 
 module.exports = {
 
+        getUserByUid: async (req, res) => {
+        try {
+            const { uid } = req.params;
+            const user = await User.findOne({ firebaseUid: uid });
+            if (!user) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+            res.json(user);
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    },
+
+
         createUser: async (req, res) => {
         try {
             const { firebaseUid, name, imageUrl } = req.body;
