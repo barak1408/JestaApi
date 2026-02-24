@@ -6,6 +6,7 @@ const {
     createJesta,
     getGivenJestas,
     getReceivedJestas,
+    getUserByUid,
     getAllJestas
 } = require('../controller/JestaController');
 router.get('/',getAllJestas );
