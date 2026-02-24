@@ -9,11 +9,15 @@ const {
     getUserByUid,
     getAllJestas
 } = require('../controller/JestaController');
+
+// jestas
 router.get('/',getAllJestas );
-router.post('/', createJesta);
-router.post('/', createUser);
+router.post('/jesta', createJesta);
 router.get('/given/:uid', getGivenJestas);
 router.get('/received/:uid', getReceivedJestas);
+
+// user
+router.post('/user', createUser);
 router.get('/:uid', getUserByUid);
 
 module.exports = router;
