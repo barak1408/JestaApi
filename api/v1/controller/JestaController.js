@@ -56,12 +56,12 @@ module.exports = {
 
             // עדכון נקודות
             await User.findOneAndUpdate(
-                { firebaseUid: jesta.giverUid },
+                { UID: jesta.giverUid },
                 { $inc: { points: jesta.reward } }
             );
 
             await User.findOneAndUpdate(
-                { firebaseUid: jesta.receiverUid },
+                { UID: jesta.receiverUid },
                 { $inc: { points: -jesta.cost } }
             );
 

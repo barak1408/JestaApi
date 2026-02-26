@@ -18,6 +18,6 @@ router.get('/received/:uid', getReceivedJestas);
 
 // user
 router.post('/user', createUser);
-router.get('user/:uid', getUserByUid);
+router.get('/user/:uid', getUserByUid);
 
 module.exports = router;
