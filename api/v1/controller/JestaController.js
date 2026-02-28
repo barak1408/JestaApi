@@ -1,5 +1,6 @@
 const Jesta = require('../model/JestaModel');
 const User = require('../model/UserModel');
+const mongoose = require('mongoose');
 
 module.exports = {
     
