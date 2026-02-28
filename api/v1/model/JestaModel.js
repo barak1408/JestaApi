@@ -4,7 +4,7 @@ const JestaSchema = new mongoose.Schema({
 
     giverUid: {
         type: String,
-        required: true
+        required: false
     },
 
     receiverUid: {
@@ -25,12 +25,6 @@ const JestaSchema = new mongoose.Schema({
     },
 
     imageUrl: String,
-
-    difficulty: {
-        type: String,
-        enum: ['easy', 'medium', 'hard'],
-        default: 'easy'
-    },
 
     reward: {
         type: Number,
