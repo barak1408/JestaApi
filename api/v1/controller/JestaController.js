@@ -77,13 +77,15 @@ createJestaAndUpdatePoints: async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-        const { jesta, points } = req.body;
+        const { uid, points } = req.params; // ✅ get from URL
+        const { jesta } = req.body;          // ✅ keep jesta in body
 
         if (!jesta || !jesta.giverUid) {
             throw new Error("Jesta and giverUid are required");
         }
 
-        if (typeof points !== "number") {
+        const pointsNumber = parseInt(points); // convert from string to number
+        if (isNaN(pointsNumber)) {
             throw new Error("points must be a number");
         }
 
@@ -93,7 +95,7 @@ createJestaAndUpdatePoints: async (req, res) => {
         // 2️⃣ update giver points inside the session
         const user = await User.findOneAndUpdate(
             { UID: jesta.giverUid },
-            { $inc: { points: -points } },  // subtract the amount you send
+            { $inc: { points: -pointsNumber } },  // subtract the amount you send
             { new: true, session }
         );
 
