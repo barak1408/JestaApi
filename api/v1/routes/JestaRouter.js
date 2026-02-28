@@ -3,17 +3,17 @@ const router = express.Router();
 
 const {
     createUser,
-    createJesta,
     getGivenJestas,
     getReceivedJestas,
     getUserByUid,
     getAllJestas,
-    addUserPoints
+    addUserPoints,
+    createJestaAndUpdatePoints
 } = require('../controller/JestaController');
 
 // jestas
+router.get('/:uid/:points', createJestaAndUpdatePoints);
 router.get('/',getAllJestas );
-router.post('/jesta', createJesta);
 router.get('/given/:uid', getGivenJestas);
 router.get('/received/:uid', getReceivedJestas);
 

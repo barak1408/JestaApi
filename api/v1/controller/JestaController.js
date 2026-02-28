@@ -71,22 +71,50 @@ createUser: async (req, res) => {
     }
 },
 
-// create a jesta
-createJesta: async (req, res) => {
+    // create a jesta and subtract points from user
+createJestaAndUpdatePoints: async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
+        const { jesta, points } = req.body;
 
-        if (!req.body.receiverUid) {
-            return res.status(400).json({ error: "receiverUid is required" });
+        if (!jesta || !jesta.giverUid) {
+            throw new Error("Jesta and giverUid are required");
         }
 
-        const jesta = await Jesta.create(req.body);
+        if (typeof points !== "number") {
+            throw new Error("points must be a number");
+        }
 
-        res.status(201).json(jesta);
+        // 1️⃣ create the Jesta inside the session
+        const newJesta = await Jesta.create([jesta], { session });
+
+        // 2️⃣ update giver points inside the session
+        const user = await User.findOneAndUpdate(
+            { UID: jesta.giverUid },
+            { $inc: { points: -points } },  // subtract the amount you send
+            { new: true, session }
+        );
+
+        if (!user) {
+            throw new Error("Giver user not found");
+        }
+
+        // 3️⃣ commit transaction
+        await session.commitTransaction();
+        session.endSession();
+
+        res.status(201).json({ jesta: newJesta[0], user });
 
     } catch (err) {
+        await session.abortTransaction();
+        session.endSession();
+        console.error("Transaction failed:", err);
         res.status(500).json({ error: err.message });
     }
 },
+
+
     // get jestas that user accepted
     getGivenJestas: async (req, res) => {
         try {
