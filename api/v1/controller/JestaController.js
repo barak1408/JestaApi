@@ -76,42 +76,41 @@ createUser: async (req, res) => {
 createJestaAndUpdatePoints: async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
+
     try {
-        const { uid, points } = req.params; // ✅ get from URL
-        const { jesta } = req.body;          // ✅ keep jesta in body
+        const { jesta, points } = req.body;
 
-        if (!jesta || !jesta.giverUid) {
-            throw new Error("Jesta and giverUid are required");
-        }
+        // validation
+        if (!jesta) throw new Error("Jesta is required");
+        if (!jesta.receiverUid) throw new Error("receiverUid is required in Jesta");
+        if (typeof points !== "number") throw new Error("points must be a number");
 
-        const pointsNumber = parseInt(points); // convert from string to number
-        if (isNaN(pointsNumber)) {
-            throw new Error("points must be a number");
-        }
+        const uid = jesta.receiverUid; // use receiverUid as the user to update
 
-        // 1️⃣ create the Jesta inside the session
+        // 1️⃣ Create the Jesta
         const newJesta = await Jesta.create([jesta], { session });
 
-        // 2️⃣ update giver points inside the session
+        // 2️⃣ Deduct points from the user
         const user = await User.findOneAndUpdate(
-            { UID: jesta.giverUid },
-            { $inc: { points: -pointsNumber } },  // subtract the amount you send
+            { UID: uid },
+            { $inc: { points: -points } },
             { new: true, session }
         );
 
-        if (!user) {
-            throw new Error("Giver user not found");
-        }
+        if (!user) throw new Error("User not found for the given receiverUid");
 
-        // 3️⃣ commit transaction
+        // 3️⃣ Commit transaction
         await session.commitTransaction();
         session.endSession();
 
+        // 4️⃣ Respond with the new Jesta and updated user
         res.status(201).json({ jesta: newJesta[0], user });
 
     } catch (err) {
+        // rollback transaction
         await session.abortTransaction();
         session.endSession();
+
         console.error("Transaction failed:", err);
         res.status(500).json({ error: err.message });
     }

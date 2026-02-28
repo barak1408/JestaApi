@@ -18,7 +18,7 @@ router.get('/given/:uid', getGivenJestas);
 router.get('/received/:uid', getReceivedJestas);
 
 // user
-router.post("/user/points/:uid/:points", addUserPoints);
+router.post("/user/:uid/:points", addUserPoints);
 router.post('/user', createUser);
 router.get('/user/:uid', getUserByUid);
 
