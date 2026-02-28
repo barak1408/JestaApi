@@ -74,44 +74,35 @@ createUser: async (req, res) => {
 
     // create a jesta and subtract points from user
 createJestaAndUpdatePoints: async (req, res) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-
     try {
-        const { jesta, points } = req.body;
+        const jestaData = req.body; // body contains full Jesta + points
 
         // validation
-        if (!jesta) throw new Error("Jesta is required");
-        if (!jesta.receiverUid) throw new Error("receiverUid is required in Jesta");
-        if (typeof points !== "number") throw new Error("points must be a number");
+        if (!jestaData.receiverUid) {
+            return res.status(400).json({ error: "receiverUid is required" });
+        }
+        if (typeof jestaData.points !== "number") {
+            return res.status(400).json({ error: "points must be a number" });
+        }
 
-        const uid = jesta.receiverUid; // use receiverUid as the user to update
+        // 1️⃣ create the Jesta
+        const newJesta = await Jesta.create(jestaData);
 
-        // 1️⃣ Create the Jesta
-        const newJesta = await Jesta.create([jesta], { session });
-
-        // 2️⃣ Deduct points from the user
+        // 2️⃣ deduct points from the user
         const user = await User.findOneAndUpdate(
-            { UID: uid },
-            { $inc: { points: -points } },
-            { new: true, session }
+            { UID: jestaData.receiverUid },
+            { $inc: { points: -jestaData.points } },
+            { new: true }
         );
 
-        if (!user) throw new Error("User not found for the given receiverUid");
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
 
-        // 3️⃣ Commit transaction
-        await session.commitTransaction();
-        session.endSession();
-
-        // 4️⃣ Respond with the new Jesta and updated user
-        res.status(201).json({ jesta: newJesta[0], user });
+        res.status(201).json({ jesta: newJesta, user });
 
     } catch (err) {
-        // rollback transaction
-        await session.abortTransaction();
-        session.endSession();
-
-        console.error("Transaction failed:", err);
+        console.error("Error creating Jesta:", err);
         res.status(500).json({ error: err.message });
     }
 },
