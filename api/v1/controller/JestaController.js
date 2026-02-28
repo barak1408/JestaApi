@@ -75,34 +75,31 @@ createUser: async (req, res) => {
     // create a jesta and subtract points from user
 createJestaAndUpdatePoints: async (req, res) => {
     try {
-        const jestaData = req.body; // body contains full Jesta + points
+        const jesta = req.body;           // Jesta object from body
+        const points = parseInt(req.params.points); // points from URL
 
-        // validation
-        if (!jestaData.receiverUid) {
-            return res.status(400).json({ error: "receiverUid is required" });
-        }
-        if (typeof jestaData.points !== "number") {
-            return res.status(400).json({ error: "points must be a number" });
-        }
+        if (!jesta) return res.status(400).json({ error: "Jesta is required" });
+        if (!jesta.receiverUid) return res.status(400).json({ error: "receiverUid is required in Jesta" });
+        if (isNaN(points)) return res.status(400).json({ error: "points must be a number" });
+
+        const uid = jesta.receiverUid;
 
         // 1️⃣ create the Jesta
-        const newJesta = await Jesta.create(jestaData);
+        const newJesta = await Jesta.create(jesta);
 
         // 2️⃣ deduct points from the user
         const user = await User.findOneAndUpdate(
-            { UID: jestaData.receiverUid },
-            { $inc: { points: -jestaData.points } },
+            { UID: uid },
+            { $inc: { points: -points } },
             { new: true }
         );
 
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
+        if (!user) return res.status(404).json({ error: "User not found" });
 
         res.status(201).json({ jesta: newJesta, user });
 
     } catch (err) {
-        console.error("Error creating Jesta:", err);
+        console.error("Error in createJestaAndUpdatePoints:", err);
         res.status(500).json({ error: err.message });
     }
 },

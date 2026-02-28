@@ -12,7 +12,7 @@ const {
 } = require('../controller/JestaController');
 
 // jestas
-router.post('/create', createJestaAndUpdatePoints);
+router.post('/create/:points', createJestaAndUpdatePoints);
 router.get('/',getAllJestas );
 router.get('/given/:uid', getGivenJestas);
 router.get('/received/:uid', getReceivedJestas);
