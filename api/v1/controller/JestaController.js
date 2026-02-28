@@ -22,55 +22,38 @@ module.exports = {
     },
 
     // Create a new user
-    createUser: async (req, res) => {
-        try {
-            const { UID, name, imageUrl, location } = req.body;
+createUser: async (req, res) => {
+    try {
 
-            // Check if user already exists
-            const existingUser = await User.findOne({ UID });
-            if (existingUser) {
-                return res.status(400).json({ error: 'User already exists' });
-            }
-
-            // Create user with default points
-            const user = await User.create({
-                UID,
-                name,
-                imageUrl,
-                location,
-                points: 500
-            });
-
-            res.status(201).json(user);
-
-        } catch (err) {
-            console.error("Error in createUser:", err);
-            res.status(500).json({ error: err.message });
+        if (!req.body.UID) {
+            return res.status(400).json({ error: "UID is required" });
         }
-    },
 
-    createJesta: async (req, res) => {
-        try {
+        const user = await User.create(req.body);
 
-            const jesta = await Jesta.create(req.body);
+        res.status(201).json(user);
 
-            // עדכון נקודות
-            await User.findOneAndUpdate(
-                { UID: jesta.giverUid },
-                { $inc: { points: jesta.reward } }
-            );
+    } catch (err) {
+        console.error("Error in createUser:", err);
+        res.status(500).json({ error: err.message });
+    }
+},
 
-            await User.findOneAndUpdate(
-                { UID: jesta.receiverUid },
-                { $inc: { points: -jesta.cost } }
-            );
+createJesta: async (req, res) => {
+    try {
 
-            res.json(jesta);
-
-        } catch (err) {
-            res.status(500).json({ error: err.message });
+        if (!req.body.receiverUid) {
+            return res.status(400).json({ error: "receiverUid is required" });
         }
-    },
+
+        const jesta = await Jesta.create(req.body);
+
+        res.status(201).json(jesta);
+
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+},
 
     getGivenJestas: async (req, res) => {
         try {
