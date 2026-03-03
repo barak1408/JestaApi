@@ -127,11 +127,11 @@ createJestaAndUpdatePoints: async (req, res) => {
     },
     // get all jestas
     getAllJestas: async (req, res) => {
-    try {
-        const jestas = await Jesta.find(); // מחזיר הכל
-        res.json(jestas);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+        try {
+            const jestas = await Jesta.find().sort({ executedAt: -1 }); // sorted newest first
+            res.json(jestas);
+        }   catch (err) {
+            res.status(500).json({ error: err.message });
     }
 }
 };
