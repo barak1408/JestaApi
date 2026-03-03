@@ -4,7 +4,8 @@ const JestaSchema = new mongoose.Schema({
 
     giverUid: {
         type: String,
-        required: false
+        required: false,
+        default: ""
     },
 
     receiverUid: {
@@ -22,6 +23,16 @@ const JestaSchema = new mongoose.Schema({
     executedAt: {
         type: Date,
         default: Date.now
+    },
+
+    executionTime: {
+        type: Date,
+        required: true
+    },
+
+    status: {
+        type: String,
+        default: "requested"  // requested, accepted, cancelled, expired
     },
 
     imageUrl: String,

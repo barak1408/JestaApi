@@ -125,12 +125,28 @@ createJestaAndUpdatePoints: async (req, res) => {
             res.status(500).json({ error: err.message });
         }
     },
-    // get all jestas
+    // get all jestas that are requested
     getAllJestas: async (req, res) => {
         try {
-            const jestas = await Jesta.find().sort({ executedAt: -1 }); // sorted newest first
-            res.json(jestas);
-        }   catch (err) {
+            const now = new Date();
+
+            // Find all Jestas
+            let jestas = await Jesta.find();
+
+            // Update expired ones and filter requested only
+            const updatedJestas = await Promise.all(jestas.map(async (jesta) => {
+                if (jesta.status === "requested" && jesta.executionTime < now) {
+                    jesta.status = "expired";
+                    await jesta.save();
+                }
+                return jesta;
+            }));
+
+            // Return only requested ones
+            const requestedJestas = updatedJestas.filter(j => j.status === "requested");
+
+            res.json(requestedJestas);
+        } catch (err) {
             res.status(500).json({ error: err.message });
     }
 }
