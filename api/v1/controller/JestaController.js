@@ -126,28 +126,35 @@ createJestaAndUpdatePoints: async (req, res) => {
         }
     },
     // get all jestas that are requested
-    getAllJestas: async (req, res) => {
-        try {
-            const now = new Date();
+getAllJestas: async (req, res) => {
+    try {
+        const now = new Date();
 
-            // Find all Jestas
-            let jestas = await Jesta.find();
+        // Find all Jestas
+        let jestas = await Jesta.find();
 
-            // Update expired ones and filter requested only
-            const updatedJestas = await Promise.all(jestas.map(async (jesta) => {
-                if (jesta.status === "requested" && jesta.executionTime < now) {
-                    jesta.status = "expired";
-                    await jesta.save();
+        const updatedJestas = await Promise.all(jestas.map(async (jesta) => {
+            if (jesta.status === "requested" && jesta.executionTime < now) { // if jesta is expired
+                // Refund the reward to the receiver
+                const user = await User.findOne({ UID: jesta.receiverUid });
+                if (user) {
+                    user.points += jesta.reward; // give back reward
+                    await user.save();
                 }
-                return jesta;
-            }));
 
-            // Return only requested ones
-            const requestedJestas = updatedJestas.filter(j => j.status === "requested");
+                // Mark jesta as expired
+                jesta.status = "expired";
+                await jesta.save();
+            }
+            return jesta;
+        }));
 
-            res.json(requestedJestas);
-        } catch (err) {
-            res.status(500).json({ error: err.message });
+        // Return only requested ones
+        const requestedJestas = updatedJestas.filter(j => j.status === "requested");
+
+        res.json(requestedJestas);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 }
 };
