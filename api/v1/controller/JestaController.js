@@ -131,7 +131,7 @@ getAllJestas: async (req, res) => {
         const now = new Date();
 
         // Find all Jestas
-        let jestas = await Jesta.find();
+        let jestas = await Jesta.find().sort({ executedAt: -1 }); // sorted newest first
 
         const updatedJestas = await Promise.all(jestas.map(async (jesta) => {
             if (jesta.status === "requested" && jesta.executionTime < now) { // if jesta is expired
