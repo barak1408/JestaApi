@@ -156,5 +156,78 @@ getAllJestas: async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
+},
+// accept a jesta
+acceptJesta: async (req, res) => {
+    try {
+        // Get UID from URL params
+        const uid = req.params.uid;
+
+        // Get Jesta object from body
+        const jesta = req.body;
+
+        // Find the Jesta in DB
+        const dbJesta = await Jesta.findById(jesta._id);
+        if (!dbJesta) return res.status(404).json({ message: "Jesta not found" });
+
+        // Prevent double accepting
+        if (dbJesta.status !== "requested") {
+            return res.status(400).json({ message: "Jesta already handled" });
+        }
+
+        // Find the user
+        const user = await User.findOne({ uid });
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        // Add reward points
+        user.points += dbJesta.reward;
+        await user.save();
+
+        // Update Jesta
+        dbJesta.giverUid = uid;
+        dbJesta.status = "accepted";
+        await dbJesta.save();
+
+        // Return updated Jesta
+        res.json(dbJesta);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+},
+// delete a jesta
+deleteJesta: async (req, res) => {
+    try {
+        // Get the Jesta object from request body
+        const jesta = req.body;
+
+        // Find the Jesta in DB
+        const dbJesta = await Jesta.findById(jesta._id);
+        if (!dbJesta) {
+            return res.status(404).json({ message: "Jesta not found" });
+        }
+
+        // Only delete if status is "requested"
+        if (dbJesta.status !== "requested") {
+            return res.status(400).json({ message: "Only requested Jestes can be deleted" });
+        }
+
+        // Delete the Jesta
+        const deletedJesta = await Jesta.findByIdAndDelete(jesta._id);
+
+        // Find the receiver and give them the reward
+        const receiver = await User.findOne({ uid: deletedJesta.receiverUid });
+        if (receiver) {
+            receiver.points += deletedJesta.reward;
+            await receiver.save();
+        }
+
+        res.json({ message: "Jesta deleted and reward given to receiver", jesta: deletedJesta });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
 }
 };
