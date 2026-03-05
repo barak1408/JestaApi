@@ -180,11 +180,9 @@ acceptJesta: async (req, res) => {
         }
 
         // Find the user
-        const user = await User.findOne({ uid });
+        const user = await User.findOne({ UID: uid });
         if (!user) {
             console.log("user not found")
-            console.log(uid)
-            console.log(user)
             return res.status(404).json({ message: "User not found" });
         }
 
