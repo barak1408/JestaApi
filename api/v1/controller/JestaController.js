@@ -168,16 +168,23 @@ acceptJesta: async (req, res) => {
 
         // Find the Jesta in DB
         const dbJesta = await Jesta.findById(jesta._id);
-        if (!dbJesta) return res.status(404).json({ message: "Jesta not found" });
+        if (!dbJesta){ 
+            console.log("Jesta not found")
+            return res.status(404).json({ message: "Jesta not found" });
+        }
 
         // Prevent double accepting
         if (dbJesta.status !== "requested") {
+            console.log("Jesta already handled")
             return res.status(400).json({ message: "Jesta already handled" });
         }
 
         // Find the user
         const user = await User.findOne({ uid });
-        if (!user) return res.status(404).json({ message: "User not found" });
+        if (!user) {
+            console.log("user not found")
+            return res.status(404).json({ message: "User not found" });
+        }
 
         // Add reward points
         user.points += dbJesta.reward;
