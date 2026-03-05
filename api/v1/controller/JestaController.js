@@ -199,14 +199,12 @@ acceptJesta: async (req, res) => {
 // delete a jesta
 deleteJesta: async (req, res) => {
     try {
-        // Get the Jesta object from request body
-        const jesta = req.body;
+        // Get Jesta ID from URL
+        const jestaId = req.params.id;
 
         // Find the Jesta in DB
-        const dbJesta = await Jesta.findById(jesta._id);
-        if (!dbJesta) {
-            return res.status(404).json({ message: "Jesta not found" });
-        }
+        const dbJesta = await Jesta.findById(jestaId);
+        if (!dbJesta) return res.status(404).json({ message: "Jesta not found" });
 
         // Only delete if status is "requested"
         if (dbJesta.status !== "requested") {
@@ -214,9 +212,9 @@ deleteJesta: async (req, res) => {
         }
 
         // Delete the Jesta
-        const deletedJesta = await Jesta.findByIdAndDelete(jesta._id);
+        const deletedJesta = await Jesta.findByIdAndDelete(jestaId);
 
-        // Find the receiver and give them the reward
+        // Give reward to receiver
         const receiver = await User.findOne({ uid: deletedJesta.receiverUid });
         if (receiver) {
             receiver.points += deletedJesta.reward;

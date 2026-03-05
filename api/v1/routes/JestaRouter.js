@@ -19,7 +19,7 @@ router.get('/',getAllJestas );
 router.get('/given/:uid', getGivenJestas);
 router.get('/received/:uid', getReceivedJestas);
 router.post("/accept/:uid", acceptJesta);
-router.delete("/delete", deleteJesta);
+router.delete("/delete/:id", deleteJesta);
 
 // user
 router.post("/user/:uid/:points", addUserPoints);
