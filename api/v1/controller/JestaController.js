@@ -193,6 +193,7 @@ acceptJesta: async (req, res) => {
         // Update Jesta
         dbJesta.giverUid = uid;
         dbJesta.status = "accepted";
+        dbJesta.giverUid = user.UID;
         await dbJesta.save();
 
         // Return updated Jesta
