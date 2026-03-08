@@ -234,5 +234,42 @@ deleteJesta: async (req, res) => {
         console.error(err);
         res.status(500).json({ error: err.message });
     }
+},
+// get schedule for a user
+getSchedule: async (req, res) => {
+    try {
+        const { uid } = req.params;
+
+        if (!uid) {
+            return res.status(400).json({ error: "UID is required" });
+        }
+
+        const now = new Date();
+
+        //  Expire any past accepted jestas
+        await Jesta.updateMany(
+            { 
+                status: "accepted", 
+                executionTime: { $lt: now } 
+            },
+            { $set: { status: "expired" } }
+        );
+
+        //  Find all future accepted jestas where user is giver or receiver
+        const schedule = await Jesta.find({
+            status: "accepted",
+            $or: [
+                { giverUid: uid },
+                { receiverUid: uid }
+            ],
+            executionTime: { $gte: now } // ensure only future jestas
+        }).sort({ executionTime: 1 }); // soonest first
+
+        res.status(200).json(schedule);
+
+    } catch (err) {
+        console.error("getSchedule error:", err);
+        res.status(500).json({ error: err.message });
+    }
 }
 };

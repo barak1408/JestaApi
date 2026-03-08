@@ -10,7 +10,8 @@ const {
     addUserPoints,
     createJestaAndUpdatePoints,
     acceptJesta,
-    deleteJesta
+    deleteJesta,
+    getSchedule
 } = require('../controller/JestaController');
 
 // jestas
@@ -20,6 +21,7 @@ router.get('/given/:uid', getGivenJestas);
 router.get('/received/:uid', getReceivedJestas);
 router.post("/accept/:uid", acceptJesta);
 router.delete("/delete/:id", deleteJesta);
+router.get("/schedule/:uid", getSchedule);
 
 // user
 router.post("/user/:uid/:points", addUserPoints);
