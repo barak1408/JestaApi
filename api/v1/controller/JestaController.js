@@ -271,5 +271,44 @@ getSchedule: async (req, res) => {
         console.error("getSchedule error:", err);
         res.status(500).json({ error: err.message });
     }
+},
+// check if username exists
+checkUsernameExists: async (req, res) => {
+    try {
+        const username = req.params.username;
+
+        const user = await User.findOne({ name: username });
+
+        if (user) {
+            return res.status(200).json({ exists: true });
+        }
+
+        return res.status(200).json({ exists: false });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+},
+// updates user
+updateUser: async (req, res) => {
+    try {
+        const uid = req.params.uid;
+        const updatedUser = req.body;
+
+        const user = await User.findOneAndUpdate(
+            { UID: uid },
+            updatedUser,
+            { new: true }
+        );
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json(user);
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 }
 };
