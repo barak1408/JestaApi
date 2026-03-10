@@ -280,10 +280,10 @@ checkUsernameExists: async (req, res) => {
         const user = await User.findOne({ name: username });
 
         if (user) {
-            return res.status(200).json({ exists: true });
+            return res.status(200).json(true);
         }
 
-        return res.status(200).json({ exists: false });
+        return res.status(200).json(false);
 
     } catch (error) {
         res.status(500).json({ message: error.message });
