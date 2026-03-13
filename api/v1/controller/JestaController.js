@@ -278,9 +278,7 @@ checkUsernameExists: async (req, res) => {
         const username = req.params.name;
 
         const user = await User.findOne({ name: username });
-        console.log(user)
-        console.log(username)
-
+        
         if (user) {
             return res.status(200).json(true);
         }
@@ -295,7 +293,10 @@ checkUsernameExists: async (req, res) => {
 updateUser: async (req, res) => {
     try {
         const uid = req.params.uid;
-        const updatedUser = req.body;
+        const updatedUser = { ...req.body };
+
+        // prevent updating points
+        delete updatedUser.points;
 
         const user = await User.findOneAndUpdate(
             { UID: uid },

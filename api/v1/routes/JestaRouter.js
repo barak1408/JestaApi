@@ -30,6 +30,6 @@ router.post("/user/:uid/:points", addUserPoints);
 router.post('/user', createUser);
 router.get('/user/:uid', getUserByUid);
 router.get('/user/exist/:name', checkUsernameExists);
-router.put("/user/update", updateUser);
+router.put("/user/update/:uid", updateUser);
 
 module.exports = router;
