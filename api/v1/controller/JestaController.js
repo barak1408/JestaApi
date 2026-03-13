@@ -275,7 +275,7 @@ getSchedule: async (req, res) => {
 // check if username exists
 checkUsernameExists: async (req, res) => {
     try {
-        const username = req.params.username;
+        const username = req.params.name;
 
         const user = await User.findOne({ name: username });
         console.log(user)
