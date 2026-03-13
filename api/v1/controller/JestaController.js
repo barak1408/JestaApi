@@ -278,6 +278,8 @@ checkUsernameExists: async (req, res) => {
         const username = req.params.username;
 
         const user = await User.findOne({ name: username });
+        console.log(user)
+        console.log(username)
 
         if (user) {
             return res.status(200).json(true);
