@@ -65,7 +65,7 @@ createUser: async (req, res) => {
             });
         }
 
-        if (!req.body.username) {
+        if (!req.body.name) {
             return res.status(400).json({
                 code: "USERNAME_REQUIRED",
                 message: "Username is required"
@@ -73,7 +73,7 @@ createUser: async (req, res) => {
         }
 
         // 🔍 check if username already exists
-        const existingUser = await User.findOne({ username: req.body.username });
+        const existingUser = await User.findOne({ username: req.body.name });
 
         if (existingUser) {
             return res.status(409).json({
@@ -207,7 +207,6 @@ acceptJesta: async (req, res) => {
 
         // Prevent double accepting
         if (dbJesta.status !== "requested") {
-            console.log("Jesta already handled")
             return res.status(400).json({ message: "Jesta already handled" });
         }
 
@@ -315,7 +314,7 @@ updateUser: async (req, res) => {
 
         // ❗ if username is being updated → check if it exists
         if (updatedUser.username) {
-            const existingUser = await User.findOne({ username: updatedUser.username });
+            const existingUser = await User.findOne({ username: updatedUser.name });
 
             if (existingUser && existingUser.UID !== uid) {
                 return res.status(409).json({
