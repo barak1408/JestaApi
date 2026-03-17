@@ -12,7 +12,6 @@ const {
     acceptJesta,
     deleteJesta,
     getSchedule,
-    checkUsernameExists,
     updateUser
 } = require('../controller/JestaController');
 
@@ -29,7 +28,6 @@ router.get("/schedule/:uid", getSchedule);
 router.post("/user/:uid/:points", addUserPoints);
 router.post('/user', createUser);
 router.get('/user/:uid', getUserByUid);
-router.get('/user/exist/:name', checkUsernameExists);
 router.put("/user/update/:uid", updateUser);
 
 module.exports = router;

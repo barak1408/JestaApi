@@ -59,19 +59,51 @@ createUser: async (req, res) => {
     try {
 
         if (!req.body.UID) {
-            return res.status(400).json({ error: "UID is required" });
+            return res.status(400).json({
+                code: "UID_REQUIRED",
+                message: "UID is required"
+            });
         }
 
+        if (!req.body.username) {
+            return res.status(400).json({
+                code: "USERNAME_REQUIRED",
+                message: "Username is required"
+            });
+        }
+
+        // 🔍 check if username already exists
+        const existingUser = await User.findOne({ username: req.body.username });
+
+        if (existingUser) {
+            return res.status(409).json({
+                code: "USERNAME_EXISTS",
+                message: "Username already exists"
+            });
+        }
+
+        // ✅ create user
         const user = await User.create(req.body);
 
-        res.status(201).json(user);
+        return res.status(201).json(user);
 
     } catch (err) {
         console.error("Error in createUser:", err);
-        res.status(500).json({ error: err.message });
+
+        // 🔥 handle duplicate key (in case unique index is triggered)
+        if (err.code === 11000) {
+            return res.status(409).json({
+                code: "USERNAME_EXISTS",
+                message: "Username already exists"
+            });
+        }
+
+        return res.status(500).json({
+            code: "SERVER_ERROR",
+            message: err.message
+        });
     }
 },
-
     // create a jesta and subtract points from user
 createJestaAndUpdatePoints: async (req, res) => {
     try {
@@ -272,31 +304,26 @@ getSchedule: async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 },
-// check if username exists
-checkUsernameExists: async (req, res) => {
-    try {
-        const username = req.params.name;
-
-        const user = await User.findOne({ name: username });
-        
-        if (user) {
-            return res.status(200).json(true);
-        }
-
-        return res.status(200).json(false);
-
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-},
 // updates user
 updateUser: async (req, res) => {
     try {
         const uid = req.params.uid;
         const updatedUser = { ...req.body };
 
-        // prevent updating points
+        // 🚫 prevent updating points
         delete updatedUser.points;
+
+        // ❗ if username is being updated → check if it exists
+        if (updatedUser.username) {
+            const existingUser = await User.findOne({ username: updatedUser.username });
+
+            if (existingUser && existingUser.UID !== uid) {
+                return res.status(409).json({
+                    code: "USERNAME_EXISTS",
+                    message: "Username already exists"
+                });
+            }
+        }
 
         const user = await User.findOneAndUpdate(
             { UID: uid },
@@ -305,13 +332,29 @@ updateUser: async (req, res) => {
         );
 
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({
+                code: "USER_NOT_FOUND",
+                message: "User not found"
+            });
         }
 
-        res.status(200).json(user);
+        return res.status(200).json(user);
 
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+    } catch (err) {
+        console.error("Error in updateUser:", err);
+
+        // 🔥 handle duplicate key (unique index)
+        if (err.code === 11000) {
+            return res.status(409).json({
+                code: "USERNAME_EXISTS",
+                message: "Username already exists"
+            });
+        }
+
+        return res.status(500).json({
+            code: "SERVER_ERROR",
+            message: err.message
+        });
     }
 }
 };
