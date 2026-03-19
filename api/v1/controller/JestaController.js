@@ -51,6 +51,7 @@ module.exports = {
         } catch (err) {
             console.error("Error in getUserByUid:", err);
             res.status(500).json({ error: err.message });
+            console.log(err.message)
         }
     },
 
