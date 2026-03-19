@@ -2,13 +2,14 @@
 const mongoose = require('mongoose');
 
 const LocationSchema = new mongoose.Schema({
-  // optional, to match your Android Location class
-  latitude: { type: Number, default: 0 },
-  longitude: { type: Number, default: 0 }
-}, { _id: false }); // no separate _id for subdocument
+  address: { type: String, default: "" },
+  city: { type: String, default: "" },
+  country: { type: String, default: "" },
+  lat: { type: Number, default: 0 },
+  lng: { type: Number, default: 0 }
+}, { _id: false }); // keep it as subdocument
 
 const UserSchema = new mongoose.Schema({
-  // matches Android field name
   UID: {
     type: String,
     required: true,
