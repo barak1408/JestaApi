@@ -1,5 +1,13 @@
 const mongoose = require('mongoose');
 
+const LocationSchema = new mongoose.Schema({
+  address: { type: String, default: "" },
+  city: { type: String, default: "" },
+  country: { type: String, default: "" },
+  lat: { type: Number, default: 0 },
+  lng: { type: Number, default: 0 }
+}, { _id: false }); // keep it as subdocument
+
 const JestaSchema = new mongoose.Schema({
 
     giverUid: {
@@ -11,6 +19,11 @@ const JestaSchema = new mongoose.Schema({
     receiverUid: {
         type: String,
         required: true
+    },
+
+    location: {
+        type: LocationSchema,
+        default: () => ({})
     },
 
     title: {
