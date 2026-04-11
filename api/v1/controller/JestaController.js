@@ -256,7 +256,7 @@ deleteJesta: async (req, res) => {
         // Give reward to receiver
         const receiver = await User.findOne({ uid: deletedJesta.receiverUid });
         if (receiver) {
-            receiver.points += deletedJesta.reward;
+            receiver.points += deletedJesta.reward + 30;
             await receiver.save();
         }
 
@@ -284,7 +284,7 @@ getSchedule: async (req, res) => {
                 status: "accepted", 
                 executionTime: { $lt: now } 
             },
-            { $set: { status: "expired" } }
+            { $set: { status: "completed" } }
         );
 
         //  Find all future accepted jestas where user is giver or receiver
