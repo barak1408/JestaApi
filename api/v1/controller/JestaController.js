@@ -259,8 +259,10 @@ deleteJesta: async (req, res) => {
         // Update points
         if (receiver) {
             receiver.points = receiver.points + dbJesta.reward + dbJesta.cost;
+            console.log("added points")
             await receiver.save();
         }
+        else console.log("shit")
 
         return res.json({
             message: "Jesta deleted and reward given to receiver"
