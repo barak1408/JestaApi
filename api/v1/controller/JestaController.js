@@ -251,7 +251,7 @@ deleteJesta: async (req, res) => {
         }
 
         // Find receiver BEFORE deleting
-        const receiver = await User.findOne({ uid: dbJesta.receiverUid });
+        const receiver = await User.findOne({ UID: dbJesta.receiverUid });
 
         // Delete after we got data
         await Jesta.findByIdAndDelete(jestaId);
@@ -259,10 +259,9 @@ deleteJesta: async (req, res) => {
         // Update points
         if (receiver) {
             receiver.points = receiver.points + dbJesta.reward + dbJesta.cost;
-            console.log("added points")
             await receiver.save();
         }
-        else console.log("shit")
+    
 
         return res.json({
             message: "Jesta deleted and reward given to receiver"
