@@ -256,7 +256,7 @@ deleteJesta: async (req, res) => {
         // Give reward to receiver
         const receiver = await User.findOne({ uid: deletedJesta.receiverUid });
         if (receiver) {
-            receiver.points += deletedJesta.reward + 30;
+            receiver.points = receiver.points + deletedJesta.reward + deletedJesta.cost;
             await receiver.save();
         }
 
