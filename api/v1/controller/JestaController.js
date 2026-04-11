@@ -238,33 +238,37 @@ acceptJesta: async (req, res) => {
 // delete a jesta
 deleteJesta: async (req, res) => {
     try {
-        // Get Jesta ID from URL
         const jestaId = req.params.id;
 
-        // Find the Jesta in DB
+        // Get Jesta first
         const dbJesta = await Jesta.findById(jestaId);
-        if (!dbJesta) return res.status(404).json({ message: "Jesta not found" });
+        if (!dbJesta) {
+            return res.status(404).json({ message: "Jesta not found" });
+        }
 
-        // Only delete if status is "requested"
         if (dbJesta.status !== "requested") {
             return res.status(400).json({ message: "Only requested Jestes can be deleted" });
         }
 
-        // Delete the Jesta
-        const deletedJesta = await Jesta.findByIdAndDelete(jestaId);
+        // Find receiver BEFORE deleting
+        const receiver = await User.findOne({ uid: dbJesta.receiverUid });
 
-        // Give reward to receiver
-        const receiver = await User.findOne({ uid: deletedJesta.receiverUid });
+        // Delete after we got data
+        await Jesta.findByIdAndDelete(jestaId);
+
+        // Update points
         if (receiver) {
-            receiver.points = receiver.points + deletedJesta.reward + deletedJesta.cost;
+            receiver.points = receiver.points + dbJesta.reward + dbJesta.cost;
             await receiver.save();
         }
 
-        res.json({ message: "Jesta deleted and reward given to receiver", jesta: deletedJesta });
+        return res.json({
+            message: "Jesta deleted and reward given to receiver"
+        });
 
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 },
 // get schedule for a user
