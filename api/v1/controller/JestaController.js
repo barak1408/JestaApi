@@ -109,7 +109,7 @@ createUser: async (req, res) => {
 createJestaAndUpdatePoints: async (req, res) => {
     try {
         const jesta = req.body;           // Jesta object from body
-        const points = parseInt(req.params.points); // points from URL
+        const points = jesta.cost + jesta.reward // points from URL
 
         if (!jesta) return res.status(400).json({ error: "Jesta is required" });
         if (!jesta.receiverUid) return res.status(400).json({ error: "receiverUid is required in Jesta" });
@@ -171,7 +171,7 @@ getAllJestas: async (req, res) => {
                 // Refund the reward to the receiver
                 const user = await User.findOne({ UID: jesta.receiverUid });
                 if (user) {
-                    user.points += jesta.reward; // give back reward
+                    user.points += jesta.reward + jesta.cost; // give back reward
                     await user.save();
                 }
 
