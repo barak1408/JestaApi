@@ -163,22 +163,75 @@ getAllJestas: async (req, res) => {
     try {
         const now = new Date();
 
+        const { sort, userLat, userLng } = req.params;
+
         // Find all Jestas
-        let jestas = await Jesta.find().sort({ executedAt: -1 }); // sorted newest first
+        let jestas = await Jesta.find();
+
+        // Sorting
+        if (sort === "Time") {
+            jestas.sort((a, b) => new Date(b.executedAt) - new Date(a.executedAt));
+        }
+        else if (sort === "Reward asc") {
+            jestas.sort((a, b) => a.reward - b.reward);
+        }
+        else if (sort === "Reward desc") {
+            jestas.sort((a, b) => b.reward - a.reward);
+        }
+        else if (sort === "Location") {
+
+            const toRadians = (deg) => deg * (Math.PI / 180);
+
+            const getDistance = (lat1, lon1, lat2, lon2) => {
+                const R = 6371;
+
+                const dLat = toRadians(lat2 - lat1);
+                const dLon = toRadians(lon2 - lon1);
+
+                const a =
+                        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                        Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+                return R * c;
+            };
+
+            jestas.sort((a, b) => {
+
+                const distanceA = getDistance(
+                        parseFloat(userLat),
+                        parseFloat(userLng),
+                        a.lat,
+                        a.lng
+                );
+
+                const distanceB = getDistance(
+                        parseFloat(userLat),
+                        parseFloat(userLng),
+                        b.lat,
+                        b.lng
+                );
+
+                return distanceA - distanceB;
+            });
+        }
 
         const updatedJestas = await Promise.all(jestas.map(async (jesta) => {
-            if (jesta.status === "requested" && jesta.executionTime < now) { // if jesta is expired
-                // Refund the reward to the receiver
+            if (jesta.status === "requested" && jesta.executionTime < now) {
+
                 const user = await User.findOne({ UID: jesta.receiverUid });
+
                 if (user) {
-                    user.points += jesta.reward + jesta.cost; // give back reward
+                    user.points += jesta.reward + jesta.cost;
                     await user.save();
                 }
 
-                // Mark jesta as expired
                 jesta.status = "expired";
                 await jesta.save();
             }
+
             return jesta;
         }));
 
@@ -186,6 +239,7 @@ getAllJestas: async (req, res) => {
         const requestedJestas = updatedJestas.filter(j => j.status === "requested");
 
         res.json(requestedJestas);
+
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
