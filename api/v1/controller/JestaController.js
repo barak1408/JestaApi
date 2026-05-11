@@ -169,7 +169,7 @@ getAllJestas: async (req, res) => {
         let jestas = await Jesta.find();
 
         // Sorting
-        if (sort === "Time") {
+        if (sort === "Creation Time") {
             jestas.sort((a, b) => new Date(b.executedAt) - new Date(a.executedAt));
         }
         else if (sort === "Reward asc") {
@@ -178,6 +178,22 @@ getAllJestas: async (req, res) => {
         else if (sort === "Reward desc") {
             jestas.sort((a, b) => b.reward - a.reward);
         }
+        else if (sort === "Time"){
+            
+        const now = new Date();
+
+        jestas.sort((a, b) => {
+
+            const timeA = new Date(a.executionTime).getTime();
+            const timeB = new Date(b.executionTime).getTime();
+
+            // difference from now
+            const diffA = Math.abs(timeA - now);
+            const diffB = Math.abs(timeB - now);
+            return diffA - diffB; // closest in time
+        });
+        }
+
         else if (sort === "Location") {
 
             const toRadians = (deg) => deg * (Math.PI / 180);
