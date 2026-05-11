@@ -17,7 +17,7 @@ const {
 
 // jestas
 router.post('/create', createJestaAndUpdatePoints);
-router.get('/',getAllJestas );
+router.get('/all/{sort}/{userLat}/{userLng}',getAllJestas );
 router.get('/given/:uid', getGivenJestas);
 router.get('/received/:uid', getReceivedJestas);
 router.post("/accept/:uid", acceptJesta);
