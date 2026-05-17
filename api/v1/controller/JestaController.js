@@ -178,20 +178,20 @@ getAllJestas: async (req, res) => {
         else if (sort === "Reward desc") {
             jestas.sort((a, b) => b.reward - a.reward);
         }
-        else if (sort === "Time"){
-            
-        const now = new Date();
+        else if (sort === "Time") {
 
-        jestas.sort((a, b) => {
+            const now = new Date();
 
-            const timeA = new Date(a.executionTime).getTime();
-            const timeB = new Date(b.executionTime).getTime();
+            jestas.sort((a, b) => {
 
-            // difference from now
-            const diffA = Math.abs(timeA - now);
-            const diffB = Math.abs(timeB - now);
-            return diffA - diffB; // closest in time
-        });
+                const timeA = new Date(a.executionTime).getTime();
+                const timeB = new Date(b.executionTime).getTime();
+
+                // difference from now
+                const diffA = Math.abs(timeA - now);
+                const diffB = Math.abs(timeB - now);
+                return diffA - diffB; // closest in time
+            });
         }
 
         else if (sort === "Location") {
@@ -214,23 +214,26 @@ getAllJestas: async (req, res) => {
                 return R * c;
             };
 
+            const userLatNum = parseFloat(userLat);
+            const userLngNum = parseFloat(userLng);
+
             jestas.sort((a, b) => {
 
                 const distanceA = getDistance(
-                        parseFloat(userLat),
-                        parseFloat(userLng),
-                        a.lat,
-                        a.lng
+                        userLatNum,
+                        userLngNum,
+                        a.location?.lat,
+                        a.location?.lng
                 );
 
                 const distanceB = getDistance(
-                        parseFloat(userLat),
-                        parseFloat(userLng),
-                        b.lat,
-                        b.lng
+                        userLatNum,
+                        userLngNum,
+                        b.location?.lat,
+                        b.location?.lng
                 );
 
-                return distanceA - distanceB;
+                return distanceA - distanceB; // closest first
             });
         }
 
