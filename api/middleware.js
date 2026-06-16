@@ -1,26 +1,29 @@
-const jwt = require('jsonwebtoken');
+const admin = require("firebase-admin");
 
-// JWT Secret key
-const JWT_SECRET = process.env.ACCESS_TOKEN_SECRET ;
+const authenticate = async (req, res, next) => {
+  try {
 
-// Middleware for JWT authentication
-const authenticateJWT = (req, res, next) => {
-  const authHeader = req.headers.authorization;
+    const authHeader = req.headers.authorization;
 
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    const token = authHeader.split(' ')[1];
+    // no token
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.sendStatus(401);
+    }
 
-    jwt.verify(token, JWT_SECRET, (err, user) => {
-      if (err) {
-        return res.sendStatus(403);
-      }
+    const token = authHeader.split("Bearer ")[1];
 
-      req.user = user;
-      next();
-    });
-  } else {
-    res.sendStatus(401);
+    // verify Firebase token
+    const decoded = await admin.auth().verifyIdToken(token);
+
+    // attach user info to request
+    req.user = decoded;
+
+    next();
+
+  } catch (err) {
+    console.log("Auth error:", err.message);
+    return res.sendStatus(403);
   }
 };
 
-module.exports = authenticateJWT;
+module.exports = authenticate;
