@@ -22,6 +22,7 @@ const authenticate = async (req, res, next) => {
 
   } catch (err) {
     console.log("Auth error:", err.message);
+    console.log("AUTH HEADER =", req.headers.authorization);
     return res.sendStatus(403);
   }
 };
