@@ -53,6 +53,7 @@
     "express": "^4.19.2",
     "fill-range": "^7.1.1",
     "finalhandler": "^1.2.0",
+    "firebase-admin": "^14.0.0",
     "forwarded": "^0.2.0",
     "fresh": "^0.5.2",
     "fs-minipass": "^2.1.0",
@@ -152,8 +153,8 @@
     "socket.io-parser": "^4.2.4",
     "sparse-bitfield": "^3.0.3",
     "statuses": "^2.0.1",
-    "string-width": "^4.2.3",
     "string_decoder": "^1.3.0",
+    "string-width": "^4.2.3",
     "strip-ansi": "^6.0.1",
     "supports-color": "^5.5.0",
     "tar": "^6.2.1",
@@ -175,7 +176,6 @@
     "ws": "^8.17.1",
     "yallist": "^4.0.0"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"

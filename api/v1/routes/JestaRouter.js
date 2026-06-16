@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
+const verifyToken = require('../../middleware/auth'); 
+
 const {
     createUser,
     getGivenJestas,
@@ -15,19 +17,25 @@ const {
     updateUser
 } = require('../controller/JestaController');
 
+
+// 🌐 PUBLIC ROUTE (NO TOKEN)
+router.get('/all/:sort/:userLat/:userLng/:uid', getAllJestas);
+
+
+// 🔐 PROTECTED ROUTES (TOKEN REQUIRED)
+
 // jestas
-router.post('/create', createJestaAndUpdatePoints);
-router.get('/all/:sort/:userLat/:userLng/:uid',getAllJestas );
-router.get('/given/:uid', getGivenJestas);
-router.get('/received/:uid', getReceivedJestas);
-router.post("/accept/:uid", acceptJesta);
-router.delete("/delete/:id", deleteJesta);
-router.get("/schedule/:uid", getSchedule);
+router.post('/create', verifyToken, createJestaAndUpdatePoints);
+router.get('/given/:uid', verifyToken, getGivenJestas);
+router.get('/received/:uid', verifyToken, getReceivedJestas);
+router.post("/accept/:uid", verifyToken, acceptJesta);
+router.delete("/delete/:id", verifyToken, deleteJesta);
+router.get("/schedule/:uid", verifyToken, getSchedule);
 
 // user
-router.post("/user/:uid/:points", addUserPoints);
-router.post('/user', createUser);
-router.get('/user/:uid', getUserByUid);
-router.put("/user/update/:uid", updateUser);
+router.post("/user/:uid/:points", verifyToken, addUserPoints);
+router.post('/user', verifyToken, createUser);
+router.get('/user/:uid', verifyToken, getUserByUid);
+router.put("/user/update/:uid", verifyToken, updateUser);
 
 module.exports = router;
