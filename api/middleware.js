@@ -1,23 +1,21 @@
 const admin = require("firebase-admin");
 
 // ✅ FIX: make sure admin is initialized before using auth()
+const { getAuth } = require("firebase-admin/auth");
+
 const authenticate = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
-    // no token
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.sendStatus(401);
     }
 
     const token = authHeader.split("Bearer ")[1];
 
-    // verify Firebase token
-    const decoded = await admin.auth().verifyIdToken(token);
+    const decoded = await getAuth().verifyIdToken(token);
 
-    // attach user info to request
     req.user = decoded;
-
     next();
 
   } catch (err) {
