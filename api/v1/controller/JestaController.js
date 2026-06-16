@@ -165,11 +165,6 @@ getAllJestas: async (req, res) => {
 
         const { sort, userLat, userLng, uid } = req.params;
 
-        const user = await User.findOne({ UID: uid });
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
         // Find all Jestas
         let jestas = await Jesta.find();
 

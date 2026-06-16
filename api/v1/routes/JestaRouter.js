@@ -19,7 +19,7 @@ const {
 
 
 // 🌐 PUBLIC ROUTE (NO TOKEN)
-router.get('/all/:sort/:userLat/:userLng/:uid', getAllJestas);
+router.get('/all/:sort/:userLat/:userLng', getAllJestas);
 
 
 // 🔐 PROTECTED ROUTES (TOKEN REQUIRED)
