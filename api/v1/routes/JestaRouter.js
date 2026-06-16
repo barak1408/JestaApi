@@ -19,6 +19,7 @@ const {
 
 // 🌐 PUBLIC ROUTE (NO TOKEN)
 router.get('/all/:sort/:userLat/:userLng', getAllJestas);
+router.get('/user/:uid', getUserByUid);
 
 
 // 🔐 PROTECTED ROUTES (TOKEN REQUIRED)
@@ -34,7 +35,6 @@ router.get("/schedule/:uid", verifyToken, getSchedule);
 // user
 router.post("/user/:uid/:points", verifyToken, addUserPoints);
 router.post('/user', verifyToken, createUser);
-router.get('/user/:uid', verifyToken, getUserByUid);
 router.put("/user/update/:uid", verifyToken, updateUser);
 
 module.exports = router;
