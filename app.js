@@ -5,10 +5,12 @@ const app = express();
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
-
-const uri = process.env.MONGO_STR;
-
 const admin = require("firebase-admin");
+
+const uri = process.env.MONGO_STR
+
+console.log("ADMIN CHECK:", admin);
+console.log("HAS CREDENTIAL:", admin?.credential);
 
 admin.initializeApp({
   credential: admin.credential.cert({
@@ -17,6 +19,9 @@ admin.initializeApp({
     privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
   })
 });
+
+console.log("ADMIN CHECK:", admin);
+console.log("HAS CREDENTIAL:", admin?.credential);
 
 async function connectDB() {
   try {
