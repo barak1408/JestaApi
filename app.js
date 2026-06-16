@@ -5,18 +5,19 @@ const app = express();
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
+
 const admin = require("firebase-admin");
 
 const uri = process.env.MONGO_STR;
 
+// ✅ FIX: correct Firebase Admin initialization
 admin.initializeApp({
-  credential: admin.cert({
+  credential: admin.credential.cert({
     projectId: process.env.FIREBASE_PROJECT_ID,
     clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
     privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
   })
 });
-
 
 async function connectDB() {
   try {
@@ -30,7 +31,7 @@ async function connectDB() {
 
 connectDB();
 
-// Enable CORS for all routes
+// Middleware
 app.use(cors());
 app.use(express.json());
 

@@ -1,8 +1,8 @@
 const admin = require("firebase-admin");
 
+// ✅ FIX: make sure admin is initialized before using auth()
 const authenticate = async (req, res, next) => {
   try {
-
     const authHeader = req.headers.authorization;
 
     // no token
